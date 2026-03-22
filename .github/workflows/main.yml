@@ -12,15 +12,18 @@ jobs:
         with:
           submodules: 'recursive'
 
-      - name: Prepare sdkconfig for S3 OPI 16MB
+      - name: Force Hardware Config
         run: |
-          echo "CONFIG_IDF_TARGET=\"esp32s3\"" > sdkconfig.defaults
-          echo "CONFIG_SPIRAM_MODE_OCT=y" >> sdkconfig.defaults
-          echo "CONFIG_ESPTOOLPY_FLASHSIZE_16MB=y" >> sdkconfig.defaults
-          echo "CONFIG_ESPTOOLPY_FLASHMODE_QIO=y" >> sdkconfig.defaults
-          echo "CONFIG_ESP32S3_DEFAULT_CPU_FREQ_240=y" >> sdkconfig.defaults
-          echo "CONFIG_LWIP_IP_FORWARD=y" >> sdkconfig.defaults
-          echo "CONFIG_LWIP_IPV4_NAPT=y" >> sdkconfig.defaults
+          # Mengatur Target dan Fitur NAT
+          echo "CONFIG_IDF_TARGET=\"esp32s3\"" >> sdkconfig
+          echo "CONFIG_LWIP_IP_FORWARD=y" >> sdkconfig
+          echo "CONFIG_LWIP_IPV4_NAPT=y" >> sdkconfig
+          
+          # Mengatur OPI PSRAM & 16MB Flash sesuai gambar Arduinodroid Anda
+          echo "CONFIG_SPIRAM_MODE_OCT=y" >> sdkconfig
+          echo "CONFIG_ESPTOOLPY_FLASHSIZE_16MB=y" >> sdkconfig
+          echo "CONFIG_ESPTOOLPY_FLASHMODE_QIO=y" >> sdkconfig
+          echo "CONFIG_ESP32S3_DEFAULT_CPU_FREQ_240=y" >> sdkconfig
 
       - name: esp-idf build
         uses: espressif/esp-idf-ci-action@v1

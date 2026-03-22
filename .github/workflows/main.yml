@@ -1,4 +1,4 @@
-name: Build ESP32-S3 NAT Router Precise
+name: Build ESP32-S3 NAT Router Final
 
 on:
   workflow_dispatch:
@@ -12,16 +12,16 @@ jobs:
         with:
           submodules: 'recursive'
 
-      - name: Prepare Build Environment
+      - name: Hard Reset Environment
         run: |
-          # Matikan Component Manager agar tidak error mencari wireguard
+          # Matikan total sistem pengunduh otomatis yang bikin error
           export IDF_COMPONENT_MANAGER=0
           echo "IDF_COMPONENT_MANAGER=0" >> $GITHUB_ENV
           
-          # Hapus file manifest yang sering menyebabkan error format
+          # Hapus semua file manifest agar tidak ada library luar yang dipanggil
           find . -name "idf_component.yml" -delete
           
-          # Konfigurasi hardware khusus S3 OPI 16MB Anda
+          # Konfigurasi hardware 16MB/OPI (Sesuai spek S3 Anda)
           cat <<EOF > sdkconfig.defaults
           CONFIG_IDF_TARGET="esp32s3"
           CONFIG_SPIRAM_MODE_OCT=y
@@ -43,6 +43,6 @@ jobs:
       - name: Upload binary
         uses: actions/upload-artifact@v4
         with:
-          name: esp32s3-precise-firmware
+          name: firmware-esp32s3-nat
           path: build/*.bin
           

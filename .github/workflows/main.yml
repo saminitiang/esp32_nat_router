@@ -13,9 +13,9 @@ jobs:
           submodules: 'recursive'
           fetch-depth: 0
 
-      - name: Fix Manifest and Components
+      - name: Fix Manifest and Disable Wireguard
         run: |
-          # Hapus manifest yang bikin error format di v4.4
+          # Hapus manifest yang bikin error format
           find . -name "idf_component.yml" -delete
           
           # Buat konfigurasi hardware khusus S3 OPI 16MB Anda
@@ -27,9 +27,11 @@ jobs:
           CONFIG_ESPTOOLPY_FLASHMODE_QIO=y
           CONFIG_LWIP_IP_FORWARD=y
           CONFIG_LWIP_IPV4_NAPT=y
+          # Matikan Wireguard agar build tidak error
+          CONFIG_ESP_WIREGUARD=n
           EOF
           
-          # Hapus file lama agar tidak konflik
+          # Hapus file config lama agar tidak konflik
           rm -f sdkconfig
 
       - name: esp-idf build
@@ -37,8 +39,6 @@ jobs:
         with:
           esp_idf_version: v4.4
           target: esp32s3
-          # Menggunakan full build untuk memastikan semua path terdeteksi
-          command: idf.py build
 
       - name: Upload binary
         uses: actions/upload-artifact@v4

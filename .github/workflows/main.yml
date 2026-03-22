@@ -12,9 +12,12 @@ jobs:
         with:
           submodules: 'recursive'
 
-      - name: Create Clean Config
+      - name: Fix Manifest and Config
         run: |
-          # Paksa konfigurasi hardware 16MB/OPI ke file default
+          # Hapus file manifest yang bikin error (Unknown keys: license)
+          find . -name "idf_component.yml" -delete
+          
+          # Buat konfigurasi hardware 16MB/OPI Anda
           cat <<EOF > sdkconfig.defaults
           CONFIG_IDF_TARGET="esp32s3"
           CONFIG_ESP32S3_DEFAULT_CPU_FREQ_240=y
@@ -24,13 +27,12 @@ jobs:
           CONFIG_LWIP_IP_FORWARD=y
           CONFIG_LWIP_IPV4_NAPT=y
           EOF
-          # Hapus sisa konfigurasi lama
+          
           rm -f sdkconfig
 
       - name: esp-idf build
         uses: espressif/esp-idf-ci-action@v1
         with:
-          # Kita gunakan v4.4 yang lebih ramah dengan kode NAT Router ini
           esp_idf_version: v4.4
           target: esp32s3
 

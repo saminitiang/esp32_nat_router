@@ -1,4 +1,4 @@
-name: Build ESP32-S3 NAT Router
+name: Build ESP32-S3 NAT Router Precise
 
 on:
   workflow_dispatch:
@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: 'recursive'
 
@@ -17,10 +17,17 @@ jobs:
         with:
           esp_idf_version: v5.1
           target: esp32s3
+          # Parameter di bawah ini menyesuaikan dengan gambar Anda
+          command: >
+            idf.py set-target esp32s3 &&
+            idf.py menuconfig --set-value CONFIG_ESP32S3_DEFAULT_CPU_FREQ_240=y &&
+            idf.py menuconfig --set-value CONFIG_SPIRAM_MODE_OCT=y &&
+            idf.py menuconfig --set-value CONFIG_ESPTOOLPY_FLASHSIZE_16MB=y &&
+            idf.py menuconfig --set-value CONFIG_ESPTOOLPY_FLASHMODE_QIO=y &&
+            idf.py build
 
       - name: Upload binary
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: esp32s3-nat-router-bin
+          name: esp32s3-precise-firmware
           path: build/*.bin
-          

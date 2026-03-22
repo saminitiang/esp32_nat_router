@@ -1,4 +1,4 @@
-name: Build ESP32-S3 NAT Router Final
+name: Build ESP32-S3 NAT Router V5-Stable
 
 on:
   workflow_dispatch:
@@ -12,12 +12,12 @@ jobs:
         with:
           submodules: 'recursive'
 
-      - name: Auto-Fix Dependencies
+      - name: Patch and Configure
         run: |
-          # 1. Hapus referensi Wireguard di semua file manifest agar tidak dicari
-          find . -name "idf_component.yml" -exec sed -i '/esp_wireguard/d' {} +
+          # Hapus manifest agar tidak mendownload Wireguard (biang kerok error)
+          find . -name "idf_component.yml" -delete
           
-          # 2. Setup hardware khusus ESP32-S3 16MB/OPI Anda
+          # Konfigurasi hardware S3 16MB OPI sesuai milik Anda
           cat <<EOF > sdkconfig.defaults
           CONFIG_IDF_TARGET="esp32s3"
           CONFIG_SPIRAM_MODE_OCT=y
@@ -39,6 +39,6 @@ jobs:
       - name: Upload binary
         uses: actions/upload-artifact@v4
         with:
-          name: esp32s3-nat-router-firmware
+          name: nat-router-s3-v5
           path: build/*.bin
           

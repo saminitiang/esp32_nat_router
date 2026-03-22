@@ -12,22 +12,25 @@ jobs:
         with:
           submodules: 'recursive'
 
+      - name: Prepare sdkconfig for S3 OPI 16MB
+        run: |
+          echo "CONFIG_IDF_TARGET=\"esp32s3\"" > sdkconfig.defaults
+          echo "CONFIG_SPIRAM_MODE_OCT=y" >> sdkconfig.defaults
+          echo "CONFIG_ESPTOOLPY_FLASHSIZE_16MB=y" >> sdkconfig.defaults
+          echo "CONFIG_ESPTOOLPY_FLASHMODE_QIO=y" >> sdkconfig.defaults
+          echo "CONFIG_ESP32S3_DEFAULT_CPU_FREQ_240=y" >> sdkconfig.defaults
+          echo "CONFIG_LWIP_IP_FORWARD=y" >> sdkconfig.defaults
+          echo "CONFIG_LWIP_IPV4_NAPT=y" >> sdkconfig.defaults
+
       - name: esp-idf build
         uses: espressif/esp-idf-ci-action@v1
         with:
           esp_idf_version: v5.1
           target: esp32s3
-          # Parameter di bawah ini menyesuaikan dengan gambar Anda
-          command: >
-            idf.py set-target esp32s3 &&
-            idf.py menuconfig --set-value CONFIG_ESP32S3_DEFAULT_CPU_FREQ_240=y &&
-            idf.py menuconfig --set-value CONFIG_SPIRAM_MODE_OCT=y &&
-            idf.py menuconfig --set-value CONFIG_ESPTOOLPY_FLASHSIZE_16MB=y &&
-            idf.py menuconfig --set-value CONFIG_ESPTOOLPY_FLASHMODE_QIO=y &&
-            idf.py build
 
       - name: Upload binary
         uses: actions/upload-artifact@v4
         with:
           name: esp32s3-precise-firmware
           path: build/*.bin
+          

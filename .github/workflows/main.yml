@@ -13,12 +13,16 @@ jobs:
           submodules: 'recursive'
           fetch-depth: 0
 
-      - name: Fix Manifest and Disable Wireguard
+      - name: Force Clean Build Environment
         run: |
-          # Hapus manifest yang bikin error format
+          # Hapus Component Manager yang menyebabkan error "esp_wireguard" dan manifest
+          rm -rf main/idf_component.yml
           find . -name "idf_component.yml" -delete
           
-          # Buat konfigurasi hardware khusus S3 OPI 16MB Anda
+          # Hapus referensi Wireguard di kode agar tidak dicari oleh compiler
+          sed -i '/esp_wireguard/d' main/CMakeLists.txt || true
+          
+          # Buat konfigurasi hardware S3 OPI 16MB sesuai gambar Anda
           cat <<EOF > sdkconfig.defaults
           CONFIG_IDF_TARGET="esp32s3"
           CONFIG_ESP32S3_DEFAULT_CPU_FREQ_240=y
@@ -27,11 +31,9 @@ jobs:
           CONFIG_ESPTOOLPY_FLASHMODE_QIO=y
           CONFIG_LWIP_IP_FORWARD=y
           CONFIG_LWIP_IPV4_NAPT=y
-          # Matikan Wireguard agar build tidak error
           CONFIG_ESP_WIREGUARD=n
           EOF
           
-          # Hapus file config lama agar tidak konflik
           rm -f sdkconfig
 
       - name: esp-idf build

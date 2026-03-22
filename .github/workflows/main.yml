@@ -12,18 +12,22 @@ jobs:
         with:
           submodules: 'recursive'
 
-      - name: Configure Hardware
+      - name: Prepare Build Environment
         run: |
-          # Hapus manifest yang bermasalah dengan lisensi di v4.4
+          # Matikan Component Manager agar tidak error mencari wireguard
+          export IDF_COMPONENT_MANAGER=0
+          echo "IDF_COMPONENT_MANAGER=0" >> $GITHUB_ENV
+          
+          # Hapus file manifest yang sering menyebabkan error format
           find . -name "idf_component.yml" -delete
           
-          # Setup hardware S3 OPI 16MB sesuai kebutuhan Anda
+          # Konfigurasi hardware khusus S3 OPI 16MB Anda
           cat <<EOF > sdkconfig.defaults
           CONFIG_IDF_TARGET="esp32s3"
-          CONFIG_ESP32S3_DEFAULT_CPU_FREQ_240=y
           CONFIG_SPIRAM_MODE_OCT=y
           CONFIG_ESPTOOLPY_FLASHSIZE_16MB=y
           CONFIG_ESPTOOLPY_FLASHMODE_QIO=y
+          CONFIG_ESP32S3_DEFAULT_CPU_FREQ_240=y
           CONFIG_LWIP_IP_FORWARD=y
           CONFIG_LWIP_IPV4_NAPT=y
           EOF
@@ -33,7 +37,7 @@ jobs:
       - name: esp-idf build
         uses: espressif/esp-idf-ci-action@v1
         with:
-          esp_idf_version: v4.4
+          esp_idf_version: v5.1
           target: esp32s3
 
       - name: Upload binary
@@ -41,3 +45,4 @@ jobs:
         with:
           name: esp32s3-precise-firmware
           path: build/*.bin
+          

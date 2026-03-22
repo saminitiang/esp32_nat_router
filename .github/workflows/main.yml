@@ -1,4 +1,4 @@
-name: Build ESP32-S3 NAT Router Final Stable
+name: Build ESP32-S3 NAT Router Final Fix
 
 on:
   workflow_dispatch:
@@ -12,12 +12,12 @@ jobs:
         with:
           submodules: 'recursive'
 
-      - name: Patch for v4.4 Stability
+      - name: Patch and Force Config
         run: |
-          # Hapus manifest yang memaksa download wireguard
+          # Matikan pencarian library Wireguard yang merusak build
           find . -name "idf_component.yml" -delete
           
-          # Setup hardware S3 16MB OPI (Octal SPI)
+          # Paksa konfigurasi hardware untuk S3 16MB OPI Anda
           cat <<EOF > sdkconfig.defaults
           CONFIG_IDF_TARGET="esp32s3"
           CONFIG_SPIRAM_MODE_OCT=y
@@ -29,17 +29,18 @@ jobs:
           CONFIG_ESP_WIREGUARD=n
           EOF
           
+          # Hapus cache sdkconfig lama
           rm -f sdkconfig
 
       - name: esp-idf build
         uses: espressif/esp-idf-ci-action@v1
         with:
-          esp_idf_version: v4.4
+          esp_idf_version: v5.1
           target: esp32s3
 
       - name: Upload binary
         uses: actions/upload-artifact@v4
         with:
-          name: nat-router-bin-v44
+          name: nat-router-esp32s3-16mb
           path: build/*.bin
           
